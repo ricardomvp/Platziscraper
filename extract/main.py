@@ -12,8 +12,9 @@ def main():
     ##################categories
     categories_link = parsing('',".HomeCategories-items")
     for category in categories_link[0]:
+        row_data=[]
         logger.info('Get Category at: ' + PLATZI + category.a['href'])#category
-
+        row_data.append(PLATZI + category.a['href'])#category
 
         ##################careers
         carrers_link= parsing(category.a['href'],".CarrersItem")
@@ -22,26 +23,39 @@ def main():
             logger.info('Carrer desc:\t' + carrer.h2.string) #carrer description
             logger.info('Carrer root:\t' + PLATZI + carrer['href']) #carrer root
 
+            row_data.append(carrer.h2.string)#carrer description
+            row_data.append(PLATZI + carrer['href'])#carrer root
+
             ##################curses
             route = parsing(carrer['href'],".route-item")
             if route:
                 #################old_page_version#################
                 course_link=[course for course in route]
                 for course in course_link:
-                    logger.info('Course desc:\t\t' + course.h4.string) #course description
-                    logger.info('course root:\t\t' + PLATZI + course.a['href'].replace('cursos','clases')+ '?filter=unanswered') #course root
+                    course_description= course.h4.string
+                    course_root= course.a['href']
+                    logger.info('Course desc:\t\t' + course_description) #course description
+                    logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases') + '?filter=unanswered') #course root
+                    row_data.append(course_description)#course description
+                    row_data.append(course_root)#course root
                     ##################content
-                    comment(course.a['href'])
+                    comment(course_root,row_data)
+
                     break
                 #################old_page_version#################
             else:
                 #################new_page_version#################
                 course_link = parsing(carrer['href'],".CareerCourseItem")
                 for course in course_link:
-                    logger.info('Course desc:\t\t' + course.h5.string) #course description
-                    logger.info('course root:\t\t' + course.a['href'])#course root
+                    course_description= course.h5.string
+                    course_root= course.a['href']
+                    logger.info('Course desc:\t\t' + course_description) #course description
+                    logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases')+ '?filter=unanswered') #course root
+                    row_data.append(course_description)#course description
+                    row_data.append(course_root)#course root
                     ##################content
-                    comment(course.a['href'])
+                    comment(course_root,course_root)
+
                     break
                 #################new_page_version#################
 
@@ -55,7 +69,7 @@ def parsing(link, clase):
     return soup.select(clase)
 
 
-def comment(course):
+def comment(course,row_data):
     course_review = parsing(course.replace('cursos','clases') + '?filter=unanswered',".BannerTop-ranking")
     discussion = parsing(course.replace('cursos','clases') + '?filter=unanswered',".Discussion")
     try:
@@ -68,32 +82,19 @@ def comment(course):
             ##logger.info('\t\t\t' + comment.select('.DiscussionMeta-date')[0].text) #time wo response
             ##logger.info('\t\t\t' + comment.select('.amount\n')[0].text) #responses
 
+            row_data.append(review)#number of reviews by course
+            row_data.append(comment.a['href'])#comment number
+            row_data.append(comment.select('.DiscussionMeta-username')[0]['href'])#Author
+            row_data.append(comment.select('.DiscussionContent-text')[0].text)#question
+            row_data.append(comment.select('.DiscussionMeta-date')[0].text)#time wo response
+            row_data.append(comment.select('.amount\n')[0].text)#number of esponses
 
-            ################## DATA TO BE INTRODUCED IN THE DB ##################
-            #print('**' + PLATZI + category.a['href'] + '**')#category
-            #print('\t' + carrer.h2.string) #carrer description
-            #print('\t' + carrer['href']) #carrer root
+            print(row_data)
+            break
 
-            #################old_page_version#################
-            #print('\t\t' + course.h4.string) #course description
-            #print('\t\t' + course.a['href'].replace('cursos','clases')) #course root
-            #################old_page_version#################
-            #################new_page_version#################
-            ##print(course.h5.string) #course description
-            ##print(course.a['href'])#course root
-            #################new_page_version#################
-
-            #print('\t\t# de reviews= ' + review) #number of reviews by course
-            #print('\t\t\t' + comment.a['href']) #comment number
-            #print('\t\t\t' + comment.select('.DiscussionMeta-username')[0]['href']) #Author
-            #print('\t\t\t' + comment.select('.DiscussionContent-text')[0].text) #question
-            #print('\t\t\t' + comment.select('.DiscussionMeta-date')[0].text) #time wo response
-            #print('\t\t\t' + comment.select('.amount\n')[0].text) #responses
-            ################## DATA TO BE INTRODUCED IN THE DB ##################
 
     except IndexError:
         logger.info('Oops! exclusive Course')
-
 
 if __name__=='__main__':
     main()
