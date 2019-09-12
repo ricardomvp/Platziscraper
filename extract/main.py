@@ -32,56 +32,125 @@ def main():
     ##################categories
     categories_link = parsing('',".HomeCategories-items")
     for category in categories_link[0]:
-        row_data=[]
-        logger.info('Get Category at: ' + PLATZI + category.a['href'])#category
-        row_data.append(category.a['href'])#category
-        ##################careers
-        carrers_link= parsing(category.a['href'],".CarrersItem")
-        carrers = [carrer for carrer in carrers_link]
-        for carrer in carrers:
-            logger.info('Carrer desc:\t' + carrer.h2.string) #carrer description
-            logger.info('Carrer root:\t' + PLATZI + carrer['href']) #carrer root
-            row_data.append(carrer.h2.string)#carrer description
-            row_data.append(carrer['href'])#carrer root
-            ##################curses
-            route = parsing(carrer['href'],".route-item")
-            if route:
-                #################old_page_version#################
-                course_link=[course for course in route]
-                for course in course_link:
-                    course_description= course.h4.string
-                    course_root= course.a['href']
-                    logger.info('Course desc:\t\t' + course_description) #course description
-                    logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases') + '?filter=unanswered') #course root
-                    row_data.append(course_description)#course description
-                    row_data.append(course_root)#course root
-                    ##################content
-                    comment(course_root,row_data)
-                    row_data.remove(course_description)#course description
-                    row_data.remove(course_root)#course root
+        start=input('Start new scrap for Category {}? [y/n],[e]nd '.format(category.a['href']))
+        if (start == 'y') or (start == 'Y'):
+            row_data=[]
+            logger.info('Get Category at: ' + PLATZI + category.a['href'])#category
+            row_data.append(category.a['href'])#category
+            ##################careers
+            carrers_link= parsing(category.a['href'],".CarrersItem")
+            carrers = [carrer for carrer in carrers_link]
+            for carrer in carrers:
+                start=input('\tStart new scrap for Carrer {}? [y/n],[e]nd,[A]ll'.format(carrer.h2.string))
+                if (start == 'y') or (start == 'Y'):
+                    logger.info('Carrer desc:\t' + carrer.h2.string) #carrer description
+                    logger.info('Carrer root:\t' + PLATZI + carrer['href']) #carrer root
+                    row_data.append(carrer.h2.string)#carrer description
+                    row_data.append(carrer['href'])#carrer root
+                    ##################curses
+                    route = parsing(carrer['href'],".route-item")
+                    if route:
+                        #################old_page_version#################
+                        course_link=[course for course in route]
+                        for course in course_link:
+                            course_description= course.h4.string
+                            course_root= course.a['href']
+                            start=input('\t\tStart new scrap for Course {}? [y/n],[e]nd '.format(course_description))
+                            if (start == 'y') or (start == 'Y'):
+                                logger.info('Course desc:\t\t' + course_description) #course description
+                                logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases') + '?filter=unanswered') #course root
+                                row_data.append(course_description)#course description
+                                row_data.append(course_root)#course root
+                                ##################content
+                                comment(course_root,row_data)
+                                ##################content
+                                row_data.remove(course_description)#course description
+                                row_data.remove(course_root)#course root
+                            if (start == 'e') or (start == 'E'):
+                                start=''
+                                break
+                        #################old_page_version#################
+                    else:
+                        #################new_page_version#################
+                        course_link = parsing(carrer['href'],".CareerCourseItem")
+                        for course in course_link:
+                            course_description= course.h5.string
+                            course_root= course.a['href']
+                            start=input('\t\tStart new scrap for Course {}? [y/n],[e]nd '.format(course_description))
+                            if (start == 'y') or (start == 'Y'):
+                                logger.info('Course desc:\t\t' + course_description) #course description
+                                logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases')+ '?filter=unanswered') #course root
+                                row_data.append(course_description)#course description
+                                row_data.append(course_root.replace('cursos','clases'))#course root
+                                ##################content
+                                comment(course_root,course_root)
+                                ##################content
+                                row_data.remove(course_description)#course description
+                                row_data.remove(course_root.replace('cursos','clases'))#course root
+                            if (start == 'e') or (start == 'E'):
+                                start=''
+                                break
+                        #################new_page_version#################
+                    row_data.remove(carrer.h2.string)#carrer description
+                    row_data.remove(carrer['href'])#carrer root
+                if (start == 'a') or (start == 'A'):
+                    logger.info('Carrer desc:\t' + carrer.h2.string) #carrer description
+                    logger.info('Carrer root:\t' + PLATZI + carrer['href']) #carrer root
+                    row_data.append(carrer.h2.string)#carrer description
+                    row_data.append(carrer['href'])#carrer root
+                    ##################curses
+                    route = parsing(carrer['href'],".route-item")
+                    if route:
+                        #################old_page_version#################
+                        course_link=[course for course in route]
+                        for course in course_link:
+                            course_description= course.h4.string
+                            course_root= course.a['href']
+                            # start=input('\t\tStart new scrap for Course {}? [y/n],[e]nd '.format(course_description))
+                            # if (start == 'y') or (start == 'Y'):
+                            logger.info('Course desc:\t\t' + course_description) #course description
+                            logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases') + '?filter=unanswered') #course root
+                            row_data.append(course_description)#course description
+                            row_data.append(course_root)#course root
+                            ##################content
+                            comment(course_root,row_data)
+                            ##################content
+                            row_data.remove(course_description)#course description
+                            row_data.remove(course_root)#course root
+                            # if (start == 'e') or (start == 'E'):
+                            #     start=''
+                            #     break
+                        #################old_page_version#################
+                    else:
+                        #################new_page_version#################
+                        course_link = parsing(carrer['href'],".CareerCourseItem")
+                        for course in course_link:
+                            course_description= course.h5.string
+                            course_root= course.a['href']
+                            # start=input('\t\tStart new scrap for Course {}? [y/n],[e]nd '.format(course_description))
+                            # if (start == 'y') or (start == 'Y'):
+                            logger.info('Course desc:\t\t' + course_description) #course description
+                            logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases')+ '?filter=unanswered') #course root
+                            row_data.append(course_description)#course description
+                            row_data.append(course_root.replace('cursos','clases'))#course root
+                            ##################content
+                            comment(course_root,course_root)
+                            ##################content
+                            row_data.remove(course_description)#course description
+                            row_data.remove(course_root.replace('cursos','clases'))#course root
+                            # if (start == 'e') or (start == 'E'):
+                            #     start=''
+                            #     break
+                        #################new_page_version#################
+                    row_data.remove(carrer.h2.string)#carrer description
+                    row_data.remove(carrer['href'])#carrer root
+                if (start == 'e') or (start == 'E'):
+                    start=''
                     break
-                #################old_page_version#################
-            else:
-                #################new_page_version#################
-                course_link = parsing(carrer['href'],".CareerCourseItem")
-                for course in course_link:
-                    course_description= course.h5.string
-                    course_root= course.a['href']
-                    logger.info('Course desc:\t\t' + course_description) #course description
-                    logger.info('course root:\t\t' + PLATZI + course_root.replace('cursos','clases')+ '?filter=unanswered') #course root
-                    row_data.append(course_description)#course description
-                    row_data.append(course_root.replace('cursos','clases'))#course root
-                    ##################content
-                    comment(course_root,course_root)
-                    row_data.remove(course_description)#course description
-                    row_data.remove(course_root.replace('cursos','clases'))#course root
-                    break
-                #################new_page_version#################
-            row_data.remove(carrer.h2.string)#carrer description
-            row_data.remove(carrer['href'])#carrer root
+            row_data.remove(category.a['href'])#category
+        if (start == 'e') or (start == 'E'):
+            start=''
             break
-        #break
-        row_data.append(category.a['href'])#category
     logger.info('DONE!!!!!!!  :)')
 
 
